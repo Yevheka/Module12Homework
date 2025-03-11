@@ -12,38 +12,66 @@ class FizzBuzz {
         this.n = n;
     }
 
-    public void fizz() throws InterruptedException {
+    public void fizz() {
         while (true) {
-            semFizz.acquire();
-            if (current > n) return;
-            System.out.print("fizz, ");
+            try {
+                semFizz.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (current > n) {
+                return;
+            }
+            System.out.print(", fizz");
             next();
         }
     }
 
-    public void buzz() throws InterruptedException {
+    public void buzz() {
         while (true) {
-            semBuzz.acquire();
-            if (current > n) return;
-            System.out.print("buzz, ");
+            try {
+                semBuzz.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (current > n) {
+                return;
+            }
+            System.out.print(", buzz");
             next();
         }
     }
 
-    public void fizzbuzz() throws InterruptedException {
+    public void fizzbuzz() {
         while (true) {
-            semFizzBuzz.acquire();
-            if (current > n) return;
-            System.out.print("fizzbuzz, ");
+            try {
+                semFizzBuzz.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (current > n) {
+                return;
+            }
+            System.out.print(", fizzbuzz");
             next();
         }
     }
 
-    public void number() throws InterruptedException {
+    public void number() {
         while (true) {
-            semNumber.acquire();
-            if (current > n) return;
-            System.out.print(current + ", ");
+            try {
+                semNumber.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (current > n) {
+                return;
+            }
+            if(current == 1){
+                System.out.print(current);
+            } else {
+                System.out.print(", " + current);
+            }
             next();
         }
     }
@@ -67,44 +95,28 @@ class FizzBuzz {
     }
 
     public void run() {
-        Thread t1 = new Thread(() -> {
-            try {
-                fizz();
-            } catch (InterruptedException ignored) {}
-        });
-        Thread t2 = new Thread(() -> {
-            try {
-                buzz();
-            } catch (InterruptedException ignored) {}
-        });
-        Thread t3 = new Thread(() -> {
-            try {
-                fizzbuzz();
-            } catch (InterruptedException ignored) {}
-        });
-        Thread t4 = new Thread(() -> {
-            try {
-                number();
-            } catch (InterruptedException ignored) {}
-        });
+        Thread a = new Thread(this::fizz);
+        Thread b = new Thread(this::buzz);
+        Thread c = new Thread(this::fizzbuzz);
+        Thread d = new Thread(this::number);
 
-        t1.start();
-        t2.start();
-        t3.start();
-        t4.start();
+        a.start();
+        b.start();
+        c.start();
+        d.start();
 
         try {
-            t1.join();
-            t2.join();
-            t3.join();
-            t4.join();
+            a.join();
+            b.join();
+            c.join();
+            d.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        int n = 3;
+        int n = 15;
         FizzBuzz fizzbuzz = new FizzBuzz(n);
         fizzbuzz.run();
     }
